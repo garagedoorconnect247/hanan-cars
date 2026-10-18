@@ -234,12 +234,13 @@ footer a{color:#fff}
   <a id="mWa" class="btn-wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
 </nav>
 
-<script src="cars.js?v=3"></script>
+<script src="cars.js?v=4"></script>
 <script>
 (function(){
   var B = BUSINESS;
   var tel = "tel:+" + B.phoneIntl;
   function waLink(text){ return "https://wa.me/" + B.phoneIntl + "?text=" + encodeURIComponent(text); }
+  function priceText(c){ return c.price ? "₪" + fmt(c.price) : '<span style="font-size:.75em">מחיר בטלפון</span>'; }
   function fmt(n){ return Number(n).toLocaleString("he-IL"); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 
@@ -276,8 +277,8 @@ footer a{color:#fff}
 
   function sorted(){
     var list = CARS.slice();
-    if (sortMode === "low") list.sort(function(a,b){ return a.price - b.price; });
-    else if (sortMode === "high") list.sort(function(a,b){ return b.price - a.price; });
+    if (sortMode === "low") list.sort(function(a,b){ return (a.price || 1e12) - (b.price || 1e12); });
+    else if (sortMode === "high") list.sort(function(a,b){ return (b.price || 0) - (a.price || 0); });
     else if (sortMode === "year") list.sort(function(a,b){ return b.year - a.year; });
     return list;
   }
@@ -293,7 +294,7 @@ footer a{color:#fff}
           '<span class="chip">יד ' + esc(c.hand) + '</span>' +
           '<span class="chip">' + esc(c.gearbox) + '</span>' +
         '</div>' +
-        '<div class="price">₪' + fmt(c.price) + '</div>' +
+        '<div class="price">' + priceText(c) + '</div>' +
       '</div></a>';
   }
 
@@ -364,7 +365,7 @@ footer a{color:#fff}
     if (!c){ app.innerHTML = '<div class="wrap sec"><div class="empty">הרכב הזה כבר נמכר או לא נמצא. <a href="#home">לכל הרכבים במלאי</a></div></div>'; return; }
     var imgs = c.images || [];
     var name = c.title + (c.trim ? " " + c.trim : "") + " " + c.year;
-    var msg = "שלום, אני מתעניין ב" + name + " (₪" + fmt(c.price) + ") שראיתי באתר";
+    var msg = "שלום, אני מתעניין ב" + name + (c.price ? " (₪" + fmt(c.price) + ")" : "") + " שראיתי באתר";
     var tradeMsg = "שלום, אני מתעניין ב" + name + " ורוצה לברר על טרייד אין לרכב שלי";
     function has(v){ return v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && !v.length); }
 
@@ -416,7 +417,7 @@ footer a{color:#fff}
           perksHTML + detailsHTML +
         '</div>' +
         '<aside class="car-side">' +
-          '<div class="car-price">₪' + fmt(c.price) + '</div>' +
+          '<div class="car-price">' + priceText(c) + '</div>' +
           '<a class="btn btn-wa" target="_blank" rel="noopener" href="' + waLink(msg) + '">' + ICON_WA + 'יצירת קשר בוואטסאפ</a>' +
           '<a class="btn btn-call" href="' + tel + '">' + ICON_CALL + '<span>התקשרו <span class="ltr">' + esc(B.phone) + '</span></span></a>' +
           '<a class="btn btn-ghost" target="_blank" rel="noopener" href="' + waLink(tradeMsg) + '">טרייד אין</a>' +
