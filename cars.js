@@ -81,7 +81,7 @@ const CARS = [
     km: 70000,
     kmLastTest: 68730,
     hand: 1,
-    price: null,                  // TODO: להוסיף מחיר
+    price: 88900,
     short: "יד ראשונה פרטית, גג שמש, מצב פנטסטי",
     test: "09/2027",
     lastTest: "08/2026",
