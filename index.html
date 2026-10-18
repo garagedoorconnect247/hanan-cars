@@ -9,6 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Secular+One&display=swap">
+<link rel="stylesheet" href="a11y.css?v=2">
+<script>
+/* החלת הגדרות נגישות שמורות לפני ציור הדף */
+(function(){try{var s=JSON.parse(localStorage.getItem("hc-a11y")||"null");if(!s)return;var c=[];if(s.fs)c.push("a11y-fs-"+s.fs);if(s.color)c.push("a11y-"+s.color);["links","font","spacing","noanim","cursor"].forEach(function(k){if(s[k])c.push("a11y-"+k)});document.documentElement.className+=" "+c.join(" ");}catch(e){}})();
+</script>
 <style>
 /* Layout: bright showroom — white lot, deep-blue text, Israeli-plate yellow as the one accent */
 :root{
@@ -20,7 +25,7 @@
   --plate:#f6c400;
   --plate-ink:#1a1a1a;
   --blue:#1d4ed8;
-  --wa:#1fa855;
+  --wa:#11803c;
   --display:"Secular One","Assistant",Arial,sans-serif;
   --body:"Assistant",Arial,"Segoe UI",sans-serif;
   --radius:14px;
@@ -125,7 +130,7 @@ nav.menu a:hover,nav.menu a.on{color:var(--ink);background:var(--bg)}
 
 /* Car page */
 .crumbs{padding-block:18px 0;color:var(--muted);font-weight:600}
-.crumbs a{text-decoration:none;color:var(--blue)}
+.crumbs a{text-decoration:underline;color:var(--blue)}
 .car-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 /* Gallery collage: big photo + two stacked */
 .collage{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:8px;margin-top:14px;aspect-ratio:2.6/1;max-width:100%}
@@ -196,6 +201,8 @@ footer a{color:#fff}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#app">דלג לתוכן הראשי</a>
+<div id="liveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <header class="top">
   <div class="wrap">
@@ -208,19 +215,24 @@ footer a{color:#fff}
       <a href="#about" data-nav="about">אודות</a>
       <a href="#contact" data-nav="contact">צור קשר</a>
     </nav>
-    <a class="top-call" id="topCall" href="#">
+    <a class="top-call" id="topCall" href="#" aria-label="התקשרו אלינו">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>
       <span id="topPhone"></span>
     </a>
   </div>
 </header>
 
-<main id="app"></main>
+<main id="app" tabindex="-1"></main>
 
 <footer>
   <div class="wrap">
     <div><strong id="fName"></strong> · רכבים יד שנייה ב<span id="fCity"></span></div>
     <div>טלפון: <a id="fPhone" class="ltr" href="#"></a></div>
+    <nav class="foot-links" aria-label="מידע משפטי">
+      <a href="#accessibility">הצהרת נגישות</a>
+      <a href="#privacy">מדיניות פרטיות ועוגיות</a>
+      <button type="button" onclick="window.hcShowCookieBar &amp;&amp; window.hcShowCookieBar()">הגדרות עוגיות</button>
+    </nav>
     <div>© <span id="fYear"></span> כל הזכויות שמורות</div>
   </div>
 </footer>
@@ -234,7 +246,7 @@ footer a{color:#fff}
   <a id="mWa" class="btn-wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
 </nav>
 
-<script src="cars.js?v=7"></script>
+<script src="cars.js?v=8"></script>
 <script>
 (function(){
   var B = BUSINESS;
@@ -249,7 +261,7 @@ footer a{color:#fff}
 
   // Placeholder drawing for a car with no photos yet
   function placeholder(c){
-    return '<svg viewBox="0 0 400 300" role="img" aria-label="תמונה תתווסף בקרוב">' +
+    return '<svg viewBox="0 0 400 300" role="img" aria-label="אין עדיין תמונה לרכב זה">' +
       '<rect width="400" height="300" fill="#eef2f7"/>' +
       '<path d="M70 190 q8-46 52-52 l40-34 q14-10 34-10 h56 q22 0 36 16 l30 30 q42 4 50 30 v20 h-298z" fill="#cfd8e6"/>' +
       '<path d="M172 108 h40 v34 h-72z M222 108 h30 q14 0 24 12 l20 22 h-74z" fill="#ffffff" opacity=".8"/>' +
@@ -259,7 +271,7 @@ footer a{color:#fff}
       '<text x="200" y="257" text-anchor="middle" font-family="Assistant,Arial" font-weight="800" font-size="15" fill="#1a1a1a">תמונה בקרוב</text>' +
     '</svg>';
   }
-  function cover(c){ return c.images && c.images.length ? '<img referrerpolicy="no-referrer" src="' + esc(c.images[0]) + '" alt="' + esc(c.title) + '" loading="lazy">' : placeholder(c); }
+  function cover(c){ return c.images && c.images.length ? '<img referrerpolicy="no-referrer" src="' + esc(c.images[0]) + '" alt="" loading="lazy">' : placeholder(c); }
 
   // Static bits
   document.getElementById("topCall").href = tel;
@@ -433,7 +445,7 @@ footer a{color:#fff}
   }
 
   function openLightbox(imgs, start, title){
-    var i = start;
+    var i = start; var prevFocus = document.activeElement;
     var lb = document.createElement("div");
     lb.className = "lb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true"); lb.setAttribute("aria-label","תמונות " + title);
     lb.innerHTML = '<div class="lb-top"><span class="lb-count"></span><button type="button" class="lb-close" aria-label="סגירה">×</button></div>' +
@@ -443,8 +455,8 @@ footer a{color:#fff}
     var img = lb.querySelector("img"), count = lb.querySelector(".lb-count");
     function show(){ img.src = imgs[i]; img.alt = title + " – תמונה " + (i+1); count.textContent = (i+1) + " / " + imgs.length; }
     function go(d){ i = (i + d + imgs.length) % imgs.length; show(); }
-    function close(){ document.removeEventListener("keydown", key); lb.remove(); document.body.style.overflow = ""; }
-    function key(e){ if (e.key === "Escape") close(); else if (e.key === "ArrowLeft") go(1); else if (e.key === "ArrowRight") go(-1); }
+    function close(){ document.removeEventListener("keydown", key); lb.remove(); document.body.style.overflow = ""; if (prevFocus && prevFocus.focus) prevFocus.focus(); }
+    function key(e){ if (e.key === "Tab"){ var f = [].slice.call(lb.querySelectorAll("button")).filter(function(b){ return !b.hidden; }); var k = f.indexOf(document.activeElement); e.preventDefault(); f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus(); return; } if (e.key === "Escape") close(); else if (e.key === "ArrowLeft") go(1); else if (e.key === "ArrowRight") go(-1); }
     lb.querySelector(".lb-close").onclick = close;
     lb.querySelector(".lb-prev").onclick = function(){ go(-1); };
     lb.querySelector(".lb-next").onclick = function(){ go(1); };
@@ -467,22 +479,95 @@ footer a{color:#fff}
       '</div></div></section>' + contactHTML();
   }
 
+
+  var UPDATED = "18/10/2026";
+  function renderAccessibility(){
+    app.innerHTML = '<section class="sec"><div class="wrap doc">' +
+      '<h1>הצהרת נגישות</h1><p class="meta">עודכנה לאחרונה: ' + UPDATED + '</p>' +
+      '<p>' + esc(B.name) + ' רואה חשיבות רבה במתן שירות שוויוני לכל הלקוחות, ובכלל זה לאנשים עם מוגבלות. השקענו מאמצים כדי שהאתר יהיה נוח, ברור ושמיש לכולם.</p>' +
+      '<h2>רמת הנגישות</h2>' +
+      '<p>האתר הונגש בהתאם לתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג-2013, ולתקן הישראלי ת״י 5568, המבוסס על הנחיות WCAG 2.0, ברמה AA.</p>' +
+      '<h2>מה עשינו כדי להנגיש את האתר</h2><ul>' +
+        '<li>האתר מותאם לשימוש במקלדת בלבד, עם סימון ברור של הרכיב שבפוקוס.</li>' +
+        '<li>קישור „דלג לתוכן הראשי” בתחילת כל עמוד.</li>' +
+        '<li>מבנה כותרות ואזורי עמוד (כותרת, ניווט, תוכן, תחתית) המזוהים על ידי קוראי מסך.</li>' +
+        '<li>טקסט חלופי לתמונות ולכפתורים שאין בהם טקסט.</li>' +
+        '<li>ניגודיות צבעים של 4.5:1 לפחות בין טקסט לרקע.</li>' +
+        '<li>קישורים שנפתחים בחלון חדש מסומנים לקוראי מסך.</li>' +
+        '<li>האתר מותאם לתצוגה בטלפונים ובמחשבים, ומאפשר הגדלה של עד 200% בלי לאבד תוכן.</li>' +
+        '<li>האתר מכבד את הגדרת „הפחתת תנועה” של מערכת ההפעלה.</li>' +
+      '</ul>' +
+      '<h2>תפריט הנגישות</h2>' +
+      '<p>בכל עמוד יש כפתור נגישות (סמל האדם הכחול בפינת המסך). אפשר לפתוח אותו גם בקיצור המקלדת Alt+A. בתפריט אפשר:</p><ul>' +
+        '<li>להגדיל את הטקסט בארבע רמות.</li><li>להפעיל ניגודיות גבוהה, היפוך צבעים או גווני אפור.</li>' +
+        '<li>להדגיש את כל הקישורים.</li><li>לעבור לגופן קריא ולהגדיל את הריווח בין השורות.</li>' +
+        '<li>לעצור אנימציות.</li><li>להגדיל את סמן העכבר.</li><li>לאפס את כל ההגדרות.</li>' +
+      '</ul><p>ההגדרות נשמרות בדפדפן שלכם לביקור הבא.</p>' +
+      '<h2>הסתייגויות</h2>' +
+      '<p>אנחנו ממשיכים לשפר את נגישות האתר. ייתכן שיימצאו בו רכיבים שעדיין אינם נגישים במלואם, למשל:</p><ul>' +
+        '<li>חלק מתמונות הרכבים מגיעות מאתר יד2 ומתוארות לפי שם הרכב בלבד.</li>' +
+        '<li>שירותים חיצוניים שהאתר מקשר אליהם, כמו וואטסאפ, אינם בשליטתנו.</li>' +
+      '</ul><p>אם נתקלתם בבעיה, נשמח שתספרו לנו ונטפל בה בהקדם.</p>' +
+      '<h2>הסדרי נגישות במגרש</h2>' +
+      '<p>למידע על הסדרי הנגישות הפיזיים במגרש ב' + esc(B.city) + ' ולתיאום הגעה, אפשר לפנות אלינו בטלפון.</p>' +
+      '<h2>פנייה לרכז הנגישות</h2>' +
+      '<div class="contact-card"><p style="margin:0 0 6px"><strong>רכז הנגישות:</strong> חנן</p>' +
+        '<p style="margin:0 0 6px"><strong>טלפון:</strong> <a class="ltr" href="' + tel + '">' + esc(B.phone) + '</a></p>' +
+        '<p style="margin:0"><strong>וואטסאפ:</strong> <a target="_blank" rel="noopener" href="' + waLink("שלום, אני פונה בנושא נגישות האתר") + '">שליחת הודעה</a></p></div>' +
+      '<p>כדי שנוכל לטפל בפנייה, נשמח לקבל תיאור של הבעיה, את העמוד שבו נתקלתם בה ואת סוג הדפדפן או הטכנולוגיה המסייעת שבה השתמשתם.</p>' +
+    '</div></section>';
+  }
+  function renderPrivacy(){
+    app.innerHTML = '<section class="sec"><div class="wrap doc">' +
+      '<h1>מדיניות פרטיות ועוגיות</h1><p class="meta">עודכנה לאחרונה: ' + UPDATED + '</p>' +
+      '<p>מדיניות זו מסבירה איזה מידע נשמר כשאתם גולשים באתר של ' + esc(B.name) + ' וכיצד אנו משתמשים בו.</p>' +
+      '<h2>מידע שאנחנו אוספים</h2>' +
+      '<p>האתר אינו כולל טפסים ואינו אוסף פרטים אישיים. כשאתם פונים אלינו בטלפון או בוואטסאפ, הפרטים שתמסרו (כמו שם ומספר טלפון) ישמשו אותנו רק כדי לחזור אליכם ולטפל בפנייה. לא נעביר אותם לאחרים, אלא אם נידרש לכך על פי דין.</p>' +
+      '<h2>עוגיות (Cookies) ואחסון מקומי</h2>' +
+      '<p>האתר אינו משתמש בעוגיות פרסום, מעקב או סטטיסטיקה. נשמרים בדפדפן שלכם בלבד, ואינם נשלחים אלינו:</p><ul>' +
+        '<li>הגדרות תפריט הנגישות שבחרתם.</li><li>הבחירה שלכם בהודעת העוגיות.</li></ul>' +
+      '<p>אפשר למחוק את המידע הזה בכל עת דרך הגדרות הדפדפן, או לשנות את הבחירה בקישור „הגדרות עוגיות” בתחתית העמוד. אם נוסיף בעתיד כלי סטטיסטיקה או פרסום, נעדכן את המדיניות ונבקש את הסכמתכם מראש.</p>' +
+      '<h2>שירותים חיצוניים</h2>' +
+      '<p>כדי להציג את האתר אנחנו נעזרים בשירותים חיצוניים, שעשויים לקבל את כתובת ה-IP של הדפדפן שלכם בהתאם למדיניות הפרטיות שלהם:</p><ul>' +
+        '<li>Google Fonts – הצגת הגופנים באתר.</li><li>יד2 – הצגת חלק מתמונות הרכבים.</li>' +
+        '<li>GitHub Pages – אחסון האתר.</li><li>WhatsApp – כשאתם בוחרים לשלוח לנו הודעה.</li></ul>' +
+      '<h2>הזכויות שלכם</h2>' +
+      '<p>לפי חוק הגנת הפרטיות, התשמ״א-1981, אתם רשאים לבקש לעיין במידע שנשמר עליכם, ולבקש לתקן או למחוק אותו. לכל שאלה או בקשה אפשר לפנות אלינו בטלפון <a class="ltr" href="' + tel + '">' + esc(B.phone) + '</a>.</p>' +
+      '<p><button type="button" class="btn btn-ghost" onclick="window.hcShowCookieBar && window.hcShowCookieBar()">שינוי הגדרות עוגיות</button></p>' +
+    '</div></section>';
+  }
+
+  var firstRender = true;
+  function afterRender(title){
+    document.title = title ? title + " | " + B.name : B.name;
+    if (firstRender){ firstRender = false; return; }
+    var h = app.querySelector("h1, h2");
+    if (h){ h.setAttribute("tabindex","-1"); h.focus({preventScroll:true}); }
+    var live = document.getElementById("liveRegion");
+    if (live) live.textContent = "נטען עמוד: " + document.title;
+  }
+
   function route(){
     var h = (location.hash || "#home").slice(1);
     document.getElementById("mWa").href = waLink("שלום, הגעתי מהאתר של " + B.name);
     var nav = h.indexOf("car-") === 0 ? "home" : h;
     document.querySelectorAll("[data-nav]").forEach(function(a){ a.classList.toggle("on", a.dataset.nav === nav); });
-    if (h.indexOf("car-") === 0){ renderCar(h.slice(4)); window.scrollTo(0,0); return; }
-    document.title = B.name;
-    if (h === "services") renderServices();
-    else if (h === "about") renderAbout();
-    else if (h === "contact"){ renderHome(); document.getElementById("contactSec").scrollIntoView(); return; }
+    if (h === "app") return;
+    if (h.indexOf("car-") === 0){ renderCar(h.slice(4)); window.scrollTo(0,0); var t = document.title; firstRender ? (firstRender = false) : afterRender(t.split(" | ")[0]); return; }
+    var title = "";
+    if (h === "services"){ renderServices(); title = "שירותים"; }
+    else if (h === "about"){ renderAbout(); title = "אודות"; }
+    else if (h === "accessibility"){ renderAccessibility(); title = "הצהרת נגישות"; }
+    else if (h === "privacy"){ renderPrivacy(); title = "מדיניות פרטיות ועוגיות"; }
+    else if (h === "contact"){ renderHome(); afterRender("צור קשר"); document.getElementById("contactSec").scrollIntoView(); var ch = document.querySelector("#contactSec h2"); if (ch){ ch.setAttribute("tabindex","-1"); ch.focus({preventScroll:true}); } return; }
     else renderHome();
+    afterRender(title);
     if (h !== "cars") window.scrollTo(0,0);
   }
   window.addEventListener("hashchange", route);
   route();
 })();
 </script>
+<script src="a11y.js?v=2"></script>
 </body>
 </html>
