@@ -186,6 +186,23 @@ nav.menu a:hover,nav.menu a.on{color:var(--ink);background:var(--bg)}
 .car-side .btn{width:100%}
 .dealer-line{text-align:center;color:var(--muted);font-weight:600;padding-top:6px;border-top:1px solid var(--line)}
 @media (max-width:900px){.car{grid-template-columns:1fr}.car-side{position:static;order:-1}}
+/* Loan calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;align-items:start}
+.calc-fields{display:grid;gap:18px}
+.calc-field label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700;margin-bottom:6px}
+.calc-field .num{display:flex;align-items:center;gap:6px}
+.calc-field input[type=number]{font:inherit;font-weight:700;width:130px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
+.calc-field input[type=range]{width:100%;accent-color:var(--blue);height:28px}
+.calc-field .range-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.calc-out{background:var(--bg);border-radius:var(--radius);padding:20px;display:grid;gap:10px;text-align:center}
+.calc-out .big{font-family:var(--display);font-size:40px;line-height:1.1;font-variant-numeric:tabular-nums}
+.calc-out dl{margin:0;display:grid;gap:6px;text-align:start}
+.calc-out dl div{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:6px;font-variant-numeric:tabular-nums}
+.calc-out dt{color:var(--muted);font-weight:600}
+.calc-out dd{margin:0;font-weight:700}
+.calc-note{margin:14px 0 0;color:var(--muted);font-size:14px;line-height:1.6;max-width:none}
+.calc-err{color:#b42318;font-weight:700;font-size:15px;margin:4px 0 0}
+@media (max-width:760px){.calc{grid-template-columns:1fr}}
 /* Lightbox */
 .lb{position:fixed;inset:0;z-index:50;background:rgba(8,12,22,.94);display:grid;grid-template-rows:auto 1fr auto;padding:calc(10px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));color:#fff}
 .lb-top{display:flex;justify-content:space-between;align-items:center;font-weight:700}
@@ -348,6 +365,69 @@ footer a{color:#fff}
       '<p>כל רכב במלאי עובר בדיקה לפני שהוא עולה למכירה, ואתם מוזמנים להביא אותו לבדיקה במכון לפי בחירתכם. אצלנו מדברים ישירות עם חנן, בלי מוקדים ובלי סיבובים.</p>';
   }
 
+
+  // ===== מחשבון הלוואה (לוח שפיצר) =====
+  var CALC_DEFAULT = { amount: 80000, months: 60, rate: 7.5 };
+  function calcBlock(price, carName){
+    var amt = price ? Math.round(price * 0.8 / 1000) * 1000 : CALC_DEFAULT.amount;
+    amt = Math.min(Math.max(amt, 5000), 500000);
+    return '<section class="block" aria-labelledby="calcTitle" data-car="' + esc(carName || "") + '">' +
+      '<h2 id="calcTitle">מחשבון הלוואה לרכב</h2>' +
+      '<div class="calc">' +
+        '<div class="calc-fields">' +
+          field("calcAmount", "סכום ההלוואה (₪)", amt, 5000, 500000, 1000, "₪5,000", "₪500,000") +
+          field("calcMonths", "תקופה (חודשים)", CALC_DEFAULT.months, 12, 100, 1, "12", "100") +
+          field("calcRate", "ריבית שנתית (%)", CALC_DEFAULT.rate, 0, 20, 0.1, "0%", "20%") +
+        '</div>' +
+        '<div class="calc-out">' +
+          '<div>החזר חודשי משוער</div>' +
+          '<div class="big" id="calcMonthly" aria-live="polite" aria-atomic="true">—</div>' +
+          '<dl><div><dt>סך ריבית</dt><dd id="calcInterest">—</dd></div><div><dt>סך כל ההחזרים</dt><dd id="calcTotal">—</dd></div></dl>' +
+          '<a class="btn btn-wa" id="calcWa" target="_blank" rel="noopener" href="#">' + ICON_WA + 'לבדיקת אפשרויות מימון</a>' +
+        '</div>' +
+      '</div>' +
+      '<p class="calc-note"><strong>הבהרה:</strong> המחשבון מיועד להמחשה בלבד ואינו מהווה הצעה, התחייבות למתן הלוואה או ייעוץ פיננסי. החישוב מבוסס על לוח סילוקין שפיצר בריבית שנתית קבועה ועל הנתונים שהוזנו, ואינו כולל עמלות, הצמדה למדד, ביטוחים או עלויות נוספות. תנאי ההלוואה בפועל, לרבות הריבית וגובה ההחזר, ייקבעו על ידי הגוף המממן בלבד ובכפוף לבדיקת זכאות ואישור אשראי. ' + esc(B.name) + ' אינה גוף מממן. אי עמידה בפירעון ההלוואה עלולה לגרור חיוב בריבית פיגורים והליכי הוצאה לפועל.</p>' +
+    '</section>';
+  }
+  function field(id, label, val, min, max, step, lo, hi){
+    return '<div class="calc-field">' +
+      '<label for="' + id + '"><span>' + label + '</span></label>' +
+      '<div class="num"><input type="number" id="' + id + '" inputmode="decimal" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '" aria-describedby="' + id + 'Err"></div>' +
+      '<input type="range" id="' + id + 'Range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '" aria-label="' + label + ' – מחוון" tabindex="-1">' +
+      '<div class="range-ends" aria-hidden="true"><span>' + lo + '</span><span>' + hi + '</span></div>' +
+      '<p class="calc-err" id="' + id + 'Err" role="alert"></p>' +
+    '</div>';
+  }
+  function bindCalc(){
+    var box = app.querySelector('[aria-labelledby="calcTitle"]');
+    if (!box) return;
+    var ids = ["calcAmount","calcMonths","calcRate"];
+    var limits = { calcAmount:[5000,500000,"סכום הלוואה"], calcMonths:[12,100,"תקופה בחודשים"], calcRate:[0,20,"ריבית שנתית"] };
+    function val(id){ return parseFloat(document.getElementById(id).value); }
+    function money(n){ return "₪" + Math.round(n).toLocaleString("he-IL"); }
+    function calc(){
+      var ok = true;
+      ids.forEach(function(id){
+        var v = val(id), L = limits[id], err = document.getElementById(id + "Err"), inp = document.getElementById(id);
+        if (isNaN(v) || v < L[0] || v > L[1]){ ok = false; err.textContent = "יש להזין " + L[2] + " בין " + L[0].toLocaleString("he-IL") + " ל-" + L[1].toLocaleString("he-IL") + "."; inp.setAttribute("aria-invalid","true"); }
+        else { err.textContent = ""; inp.removeAttribute("aria-invalid"); }
+      });
+      var out = document.getElementById("calcMonthly"), ti = document.getElementById("calcInterest"), tt = document.getElementById("calcTotal");
+      if (!ok){ out.textContent = "—"; ti.textContent = "—"; tt.textContent = "—"; return; }
+      var P = val("calcAmount"), n = Math.round(val("calcMonths")), r = val("calcRate") / 100 / 12;
+      var m = r === 0 ? P / n : P * r / (1 - Math.pow(1 + r, -n));
+      out.textContent = money(m); tt.textContent = money(m * n); ti.textContent = money(m * n - P);
+      var car = box.getAttribute("data-car");
+      document.getElementById("calcWa").href = waLink("שלום, " + (car ? "לגבי " + car + " – " : "") + "אשמח לבדוק אפשרויות מימון: הלוואה של " + money(P) + " ל-" + n + " חודשים.");
+    }
+    ids.forEach(function(id){
+      var num = document.getElementById(id), rng = document.getElementById(id + "Range");
+      num.addEventListener("input", function(){ if (num.value !== "") rng.value = num.value; calc(); });
+      rng.addEventListener("input", function(){ num.value = rng.value; calc(); });
+    });
+    calc();
+  }
+
   function renderHome(){
     var list = sorted();
     app.innerHTML =
@@ -369,11 +449,13 @@ footer a{color:#fff}
           '</select></label></div>' +
         (list.length ? '<div class="grid">' + list.map(cardHTML).join("") + '</div>' : '<div class="empty">המלאי מתעדכן. התקשרו לשמוע על רכבים שבדרך.</div>') +
       '</div></section>' +
+      '<section class="sec" style="padding-top:0"><div class="wrap">' + calcBlock(null, "") + '</div></section>' +
       '<section class="sec" style="background:var(--surface);border-block:1px solid var(--line)"><div class="wrap">' +
         '<div class="sec-head"><div><h2>מה אנחנו עושים</h2></div><a class="btn btn-ghost" href="#services">כל השירותים</a></div>' +
         servicesHTML() +
       '</div></section>' +
       contactHTML();
+    bindCalc();
     var sel = document.getElementById("sortSel");
     sel.value = sortMode;
     sel.addEventListener("change", function(){ sortMode = sel.value; renderHome(); document.getElementById("cars").scrollIntoView(); });
@@ -433,7 +515,7 @@ footer a{color:#fff}
           '<div class="car-title"><h1>' + esc(c.title) + '</h1>' + (has(c.trim) ? '<p>' + esc(c.trim) + '</p>' : '') + '</div>' +
           stats +
           (has(c.description) ? '<section class="block desc"><h2>על הרכב</h2><p>' + esc(c.description) + '</p></section>' : '') +
-          perksHTML + detailsHTML +
+          perksHTML + detailsHTML + calcBlock(c.price, c.title + " " + c.year) +
         '</div>' +
         '<aside class="car-side">' +
           '<div class="car-price">' + priceText(c) + (c.priceNote ? '<small style="display:block;font-family:var(--body);font-size:15px;color:var(--muted)">' + esc(c.priceNote) + '</small>' : '') + '</div>' +
@@ -444,6 +526,7 @@ footer a{color:#fff}
         '</aside>' +
       '</div></div>';
     document.getElementById("mWa").href = waLink(msg);
+    bindCalc();
     document.title = c.title + " " + c.year + " | " + B.name;
 
     app.querySelectorAll(".collage button[data-i]").forEach(function(b){
@@ -575,6 +658,6 @@ footer a{color:#fff}
   route();
 })();
 </script>
-<script src="a11y.js?v=2"></script>
+<script src="a11y.js?v=3"></script>
 </body>
 </html>
