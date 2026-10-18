@@ -234,7 +234,7 @@ footer a{color:#fff}
   <a id="mWa" class="btn-wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
 </nav>
 
-<script src="cars.js?v=2"></script>
+<script src="cars.js?v=3"></script>
 <script>
 (function(){
   var B = BUSINESS;
@@ -384,7 +384,7 @@ footer a{color:#fff}
     // Key stats
     var stats = '<div class="keystats">' +
       '<div class="keystat"><span>שנה</span><b>' + esc(c.year) + '</b>' + (has(c.roadDate) ? '<small>עלייה לכביש ' + esc(c.roadDate) + '</small>' : '') + '</div>' +
-      '<div class="keystat"><span>ק״מ</span><b>' + fmt(c.km) + '</b></div>' +
+      '<div class="keystat"><span>ק״מ</span><b>' + fmt(c.km) + '</b>' + (has(c.kmLastTest) ? '<small>בטסט האחרון ' + fmt(c.kmLastTest) + '</small>' : '') + '</div>' +
       '<div class="keystat"><span>יד</span><b>' + esc(c.hand) + '</b></div>' +
     '</div>';
 
@@ -401,7 +401,7 @@ footer a{color:#fff}
     }).join("") + '</div></section>' : '';
 
     // Details
-    var rows = [["טסט עד",c.test],["תאריך טסט אחרון",c.lastTest],["צבע",c.color],["בעלות מקורית",c.ownership],["תיבת הילוכים",c.gearbox],["סוג מנוע",c.fuel],["מרכב",c.body],["מושבים",c.seats],["כוח סוס",c.hp],["נפח מנוע",c.engine],["צריכת דלק משולבת",c.consumption],["שינויים מהדגם המקורי",c.changes]]
+    var rows = [["טסט עד",c.test],["תאריך טסט אחרון",c.lastTest],["צבע",c.color],["בעלות מקורית",c.ownership],["תיבת הילוכים",c.gearbox],["סוג מנוע",c.fuel],["מרכב",c.body],["מושבים",c.seats],["כוח סוס",c.hp],["נפח מנוע",c.engine],["צריכת דלק משולבת",c.consumption],["קיבולת סוללה (קוט״ש)",c.battery],["שינויים מהדגם המקורי",c.changes]]
       .filter(function(r){ return has(r[1]); });
     var detailsHTML = rows.length ? '<section class="block"><h2>פרטים נוספים</h2><dl class="details">' + rows.map(function(r){ return '<div><dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join("") + '</dl></section>' : '';
 
