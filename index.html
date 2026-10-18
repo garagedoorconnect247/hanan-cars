@@ -234,7 +234,7 @@ footer a{color:#fff}
   <a id="mWa" class="btn-wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
 </nav>
 
-<script src="cars.js?v=6"></script>
+<script src="cars.js?v=7"></script>
 <script>
 (function(){
   var B = BUSINESS;
@@ -259,7 +259,7 @@ footer a{color:#fff}
       '<text x="200" y="257" text-anchor="middle" font-family="Assistant,Arial" font-weight="800" font-size="15" fill="#1a1a1a">תמונה בקרוב</text>' +
     '</svg>';
   }
-  function cover(c){ return c.images && c.images.length ? '<img src="' + esc(c.images[0]) + '" alt="' + esc(c.title) + '" loading="lazy">' : placeholder(c); }
+  function cover(c){ return c.images && c.images.length ? '<img referrerpolicy="no-referrer" src="' + esc(c.images[0]) + '" alt="' + esc(c.title) + '" loading="lazy">' : placeholder(c); }
 
   // Static bits
   document.getElementById("topCall").href = tel;
@@ -294,7 +294,7 @@ footer a{color:#fff}
           '<span class="chip">יד ' + esc(c.hand) + '</span>' +
           '<span class="chip">' + esc(c.gearbox) + '</span>' +
         '</div>' +
-        '<div class="price">' + priceText(c) + '</div>' +
+        '<div class="price">' + priceText(c) + (c.priceNote ? ' <small>' + esc(c.priceNote) + '</small>' : '') + '</div>' +
       '</div></a>';
   }
 
@@ -378,7 +378,7 @@ footer a{color:#fff}
       var cls = shown.length === 1 ? " one" : shown.length === 2 ? " two" : "";
       gallery = '<div class="collage' + cls + '">' + shown.map(function(src, i){
         var label = (i === shown.length - 1 && imgs.length > 1) ? '<span class="show-all">הצגת ' + imgs.length + ' תמונות</span>' : '';
-        return '<button type="button" data-i="' + i + '" aria-label="פתיחת תמונה ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(c.title) + ' – תמונה ' + (i+1) + '"' + (i ? ' loading="lazy"' : '') + '>' + label + '</button>';
+        return '<button type="button" data-i="' + i + '" aria-label="פתיחת תמונה ' + (i+1) + '"><img referrerpolicy="no-referrer" src="' + esc(src) + '" alt="' + esc(c.title) + ' – תמונה ' + (i+1) + '"' + (i ? ' loading="lazy"' : '') + '>' + label + '</button>';
       }).join("") + '</div>';
     }
 
@@ -417,7 +417,7 @@ footer a{color:#fff}
           perksHTML + detailsHTML +
         '</div>' +
         '<aside class="car-side">' +
-          '<div class="car-price">' + priceText(c) + '</div>' +
+          '<div class="car-price">' + priceText(c) + (c.priceNote ? '<small style="display:block;font-family:var(--body);font-size:15px;color:var(--muted)">' + esc(c.priceNote) + '</small>' : '') + '</div>' +
           '<a class="btn btn-wa" target="_blank" rel="noopener" href="' + waLink(msg) + '">' + ICON_WA + 'יצירת קשר בוואטסאפ</a>' +
           '<a class="btn btn-call" href="' + tel + '">' + ICON_CALL + '<span>התקשרו <span class="ltr">' + esc(B.phone) + '</span></span></a>' +
           '<a class="btn btn-ghost" target="_blank" rel="noopener" href="' + waLink(tradeMsg) + '">טרייד אין</a>' +
@@ -437,7 +437,7 @@ footer a{color:#fff}
     var lb = document.createElement("div");
     lb.className = "lb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true"); lb.setAttribute("aria-label","תמונות " + title);
     lb.innerHTML = '<div class="lb-top"><span class="lb-count"></span><button type="button" class="lb-close" aria-label="סגירה">×</button></div>' +
-      '<div class="lb-stage"><img alt=""><button type="button" class="lb-nav lb-prev" aria-label="התמונה הקודמת">›</button><button type="button" class="lb-nav lb-next" aria-label="התמונה הבאה">‹</button></div><div></div>';
+      '<div class="lb-stage"><img alt="" referrerpolicy="no-referrer"><button type="button" class="lb-nav lb-prev" aria-label="התמונה הקודמת">›</button><button type="button" class="lb-nav lb-next" aria-label="התמונה הבאה">‹</button></div><div></div>';
     document.body.appendChild(lb);
     document.body.style.overflow = "hidden";
     var img = lb.querySelector("img"), count = lb.querySelector(".lb-count");
