@@ -111,8 +111,11 @@ nav.menu a:hover,nav.menu a.on{color:var(--ink);background:var(--bg)}
 .card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .card h3{font-size:21px}
 .card .short{color:var(--muted);font-size:15px;margin:0}
-.card.sold .card-img img{filter:grayscale(.85);opacity:.75}
-.sold-tag{position:absolute;top:10px;left:10px;background:#b42318;color:#fff;font-weight:800;font-size:15px;padding:3px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.card.sold .card-img img,.collage.sold img{filter:grayscale(.7) brightness(.9)}
+/* "נמכר" sash across the photo, with a line above and below the word */
+.sold-band{position:absolute;left:-25%;right:-25%;top:50%;transform:translateY(-50%) rotate(-14deg);background:rgba(180,35,24,.93);box-shadow:0 6px 18px rgba(0,0,0,.35);padding:7px 0;display:flex;justify-content:center;pointer-events:none;z-index:2}
+.sold-band span{display:block;color:#fff;font-family:var(--display);font-weight:900;font-size:30px;line-height:1.1;letter-spacing:.12em;padding:3px 34px;border-top:3px solid #fff;border-bottom:3px solid #fff}
+.collage .sold-band span{font-size:clamp(30px,5vw,54px);border-width:4px;padding:4px 50px}
 .card.sold .price{color:#b42318}
 .sold-banner{background:#fdecea;border:1px solid #f5c2bd;color:#7a1a12;border-radius:var(--radius);padding:14px 18px;font-weight:700;margin:0 0 16px}
 .sold-banner a{color:inherit}
@@ -327,7 +330,7 @@ footer a{color:#fff}
 
   function cardHTML(c){
     return '<a class="card' + (c.sold ? ' sold' : '') + '" href="#car-' + esc(c.id) + '">' +
-      '<div class="card-img">' + cover(c) + '<span class="card-year">' + esc(c.year) + '</span>' + (c.sold ? '<span class="sold-tag">נמכר</span>' : '') + '</div>' +
+      '<div class="card-img">' + cover(c) + '<span class="card-year">' + esc(c.year) + '</span>' + (c.sold ? '<span class="sold-band" aria-hidden="true"><span>נמכר</span></span>' : '') + '</div>' +
       '<div class="card-body">' +
         '<h3>' + esc(c.title) + '</h3>' +
         '<p class="short">' + esc(c.short) + '</p>' +
@@ -483,9 +486,9 @@ footer a{color:#fff}
     } else {
       var shown = imgs.slice(0, 3);
       var cls = shown.length === 1 ? " one" : shown.length === 2 ? " two" : "";
-      gallery = '<div class="collage' + cls + '">' + shown.map(function(src, i){
+      gallery = '<div class="collage' + cls + (c.sold ? ' sold' : '') + '">' + shown.map(function(src, i){
         var label = (i === shown.length - 1 && imgs.length > 1) ? '<span class="show-all">הצגת ' + imgs.length + ' תמונות</span>' : '';
-        return '<button type="button" data-i="' + i + '" aria-label="פתיחת תמונה ' + (i+1) + '"><img referrerpolicy="no-referrer" src="' + esc(src) + '" alt="' + esc(c.title) + ' – תמונה ' + (i+1) + '"' + (i ? ' loading="lazy"' : '') + '>' + label + '</button>';
+        return '<button type="button" data-i="' + i + '" aria-label="פתיחת תמונה ' + (i+1) + '"><img referrerpolicy="no-referrer" src="' + esc(src) + '" alt="' + esc(c.title) + ' – תמונה ' + (i+1) + '"' + (i ? ' loading="lazy"' : '') + '>' + label + (c.sold && i === 0 ? '<span class="sold-band" aria-hidden="true"><span>נמכר</span></span>' : '') + '</button>';
       }).join("") + '</div>';
     }
 
