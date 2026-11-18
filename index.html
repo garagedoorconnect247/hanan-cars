@@ -143,6 +143,10 @@ nav.menu a:hover,nav.menu a.on{color:var(--ink);background:var(--bg)}
 .specs-line{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
 .chip{background:var(--bg);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:600;color:var(--muted)}
 .price{font-family:var(--display);font-size:24px;margin-top:auto;padding-top:6px;font-variant-numeric:tabular-nums}
+.old-price{font-family:var(--body);font-size:.62em;font-weight:600;color:var(--muted);text-decoration-thickness:2px;margin-inline-start:6px;white-space:nowrap}
+.drop-tag{position:absolute;bottom:10px;right:10px;background:#0f7b4a;color:#fff;font-weight:800;font-size:14px;padding:3px 10px 3px 12px;border-radius:999px;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.drop-tag svg{width:14px;height:14px}
+.car-side .drop-note{color:#0f7b4a;font-weight:800;font-size:15px;margin-top:-6px}
 .price small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:600}
 
 /* Services */
@@ -299,13 +303,17 @@ footer a{color:#fff}
   <a id="mWa" class="btn-wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
 </nav>
 
-<script src="cars.js?v=10"></script>
+<script src="cars.js?v=11"></script>
 <script>
 (function(){
   var B = BUSINESS;
   var tel = "tel:+" + B.phoneIntl;
   function waLink(text){ return "https://wa.me/" + B.phoneIntl + "?text=" + encodeURIComponent(text); }
-  function priceText(c){ return c.price ? "₪" + fmt(c.price) : '<span style="font-size:.75em">מחיר בטלפון</span>'; }
+  function dropped(c){ return !c.sold && c.price && c.oldPrice && c.oldPrice > c.price; }
+  function priceText(c){
+    if (!c.price) return '<span style="font-size:.75em">מחיר בטלפון</span>';
+    return "₪" + fmt(c.price) + (dropped(c) ? ' <s class="old-price"><span class="sr-only">במקום </span>₪' + fmt(c.oldPrice) + '</s>' : '');
+  }
   function inStock(){ return CARS.filter(function(c){ return !c.sold; }).length; }
   function fmt(n){ return Number(n).toLocaleString("he-IL"); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
@@ -351,7 +359,7 @@ footer a{color:#fff}
 
   function cardHTML(c){
     return '<a class="card' + (c.sold ? ' sold' : '') + '" href="#car-' + esc(c.id) + '">' +
-      '<div class="card-img">' + cover(c) + '<span class="card-year">' + esc(c.year) + '</span>' + (c.sold ? '<span class="sold-band" aria-hidden="true"><span>נמכר</span></span>' : '') + '</div>' +
+      '<div class="card-img">' + cover(c) + '<span class="card-year">' + esc(c.year) + '</span>' + (c.sold ? '<span class="sold-band" aria-hidden="true"><span>נמכר</span></span>' : '') + (dropped(c) ? '<span class="drop-tag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5 12l7 7 7-7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>ירד במחיר</span>' : '') + '</div>' +
       '<div class="card-body">' +
         '<h3>' + esc(c.title) + '</h3>' +
         '<p class="short">' + esc(c.short) + '</p>' +
@@ -550,6 +558,7 @@ footer a{color:#fff}
         '</div>' +
         '<aside class="car-side">' +
           '<div class="car-price">' + (c.sold ? '<span style="color:#b42318">נמכר</span>' : priceText(c)) + (c.priceNote ? '<small style="display:block;font-family:var(--body);font-size:15px;color:var(--muted)">' + esc(c.priceNote) + '</small>' : '') + '</div>' +
+          (dropped(c) ? '<div class="drop-note">ירד במחיר – חיסכון של ₪' + fmt(c.oldPrice - c.price) + '</div>' : '') +
           '<a class="btn btn-wa" target="_blank" rel="noopener" href="' + waLink(msg) + '">' + ICON_WA + (c.sold ? 'מחפשים רכב דומה? וואטסאפ' : 'יצירת קשר בוואטסאפ') + '</a>' +
           '<a class="btn btn-call" href="' + tel + '">' + ICON_CALL + '<span>התקשרו <span class="ltr">' + esc(B.phone) + '</span></span></a>' +
           '<a class="btn btn-ghost" target="_blank" rel="noopener" href="' + waLink(tradeMsg) + '">טרייד אין</a>' +
